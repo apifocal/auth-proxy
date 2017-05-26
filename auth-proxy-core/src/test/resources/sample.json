@@ -1,0 +1,50 @@
+{
+    "size": 0,
+    "query": {
+        "bool": {
+            "must": [
+                {
+                    "range": {
+                        "eventTime": {
+                            "gte": "1490135974456",
+                            "lte": "1490136874456",
+                            "format": "epoch_millis"
+                        }
+                    }
+                },
+                {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "tenant.id: AND project.id:"
+                    }
+                }
+            ]
+        }
+    },
+    "aggs": {
+        "3": {
+            "terms": {
+                "field": "type",
+                "size": 10,
+                "order": {
+                    "_term": "desc"
+                }
+            },
+            "aggs": {
+                "2": {
+                    "date_histogram": {
+                        "interval": "5m",
+                        "field": "eventTime",
+                        "min_doc_count": 0,
+                        "extended_bounds": {
+                            "min": "1490135974456",
+                            "max": "1490136874456"
+                        },
+                        "format": "epoch_millis"
+                    },
+                    "aggs": {}
+                }
+            }
+        }
+    }
+}
