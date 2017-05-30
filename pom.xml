@@ -12,7 +12,7 @@
     <groupId>org.apifocal.authproxy</groupId>
     <artifactId>auth-proxy</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    
+
     <packaging>pom</packaging>
 
     <name>auth proxy :: parent</name>
@@ -21,6 +21,7 @@
     <modules>
         <module>auth-proxy-api</module>
         <module>auth-proxy-core</module>
+        <module>auth-proxy-features</module>
         <module>auth-proxy-jaas</module>
     </modules>
 
@@ -30,12 +31,13 @@
         <tag>HEAD</tag>
         <url>https://github.com/apifocal/auth-proxy</url>
     </scm>
-    
+
     <properties>
         <jackson.version>2.6.3</jackson.version>
         <junit.version>4.12</junit.version>
         <osgi.version>6.0.0</osgi.version>
         <slf4j.version>1.7.21</slf4j.version>
+        <karaf.version>4.0.8</karaf.version>
     </properties>
 
     <dependencyManagement>
@@ -98,7 +100,7 @@
                 <plugin>
                     <groupId>org.apache.karaf.tooling</groupId>
                     <artifactId>karaf-maven-plugin</artifactId>
-                    <version>4.0.5</version>  <!-- TODO: use ${karaf.version} when KARAF-4930 gets closed -->
+                    <version>${karaf-maven-plugin.version}</version>  <!-- TODO: use ${karaf.version} when KARAF-4930 gets closed -->
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
