@@ -19,6 +19,13 @@
             <type>zip</type>
             <version>${karaf.version}</version>  <!-- TODO: use ${karaf.version} when KARAF-4930 gets closed -->
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>auth-proxy-jaas</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
