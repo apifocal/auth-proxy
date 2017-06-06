@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.apifocal.authproxy</groupId>
         <artifactId>auth-proxy</artifactId>
-        <version>0.1.0</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>auth-proxy-core</artifactId>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.apifocal.authproxy</groupId>
             <artifactId>auth-proxy-api</artifactId>
-            <version>0.1.0</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
                 
         <dependency>
