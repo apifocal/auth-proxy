@@ -52,33 +52,34 @@ import org.slf4j.LoggerFactory;
         service = {Servlet.class},
         properties = "OSGI-INF/AuthProxy.properties",
         configurationPid = "org.apifocal.authproxy.AuthProxyServlet",
-        configurationPolicy = ConfigurationPolicy.OPTIONAL
+        configurationPolicy = ConfigurationPolicy.REQUIRE
 )
 public class AuthProxyServlet extends HttpServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthProxyServlet.class);
     private static final AtomicInteger EXCHANGE_COUNTER = new AtomicInteger(0);
-    
+
     private URL proxyURL;
-    
-    private void loadConfig(Map<String, Object> properties) {
-        try {
-            proxyURL = new URL(properties.get("proxyURL").toString());
-        } catch (MalformedURLException ex) {
-            LOG.error("invalid proxy url", ex);
-        }        
+
+    @interface Config {
+
+        String proxyURL() default "http://localhost";
+    }
+
+    private void loadConfig(Config config) throws MalformedURLException {
+        proxyURL = new URL(config.proxyURL());
     }
 
     @Activate
-    void onActivate(Map<String, Object> properties) {
-        loadConfig(properties);
+    void onActivate(Config config) throws MalformedURLException {
+        loadConfig(config);
     }
-    
+
     @Modified
-    void onModified(Map<String, Object> properties) {
-        loadConfig(properties);
+    void onModified(Config config) throws MalformedURLException {
+        loadConfig(config);
     }
-    
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
