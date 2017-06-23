@@ -32,11 +32,14 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.apifocal.authproxy.api.QueryEditor;
+import org.slf4j.LoggerFactory;
 
 /**
  * query editor implementation that adds a filter for authentication purposes
  */
 public abstract class ElasticSearchAuthQueryEditor implements QueryEditor {
+
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(AuthProxyServlet.class);
 
     protected static final ObjectMapper mapper = new ObjectMapper();
 
@@ -56,47 +59,52 @@ public abstract class ElasticSearchAuthQueryEditor implements QueryEditor {
 
             ObjectNode filterElement = createAuthFilterElement(req);
 
-            //update 'aggs' element
-            try {
-                ObjectNode elemAggs = context.read("$.aggs");
+            if (filterElement != null) {
+                //update 'aggs' element
+                try {
+                    ObjectNode elemAggs = context.read("$.aggs");
 
-                Iterator<Map.Entry<String, JsonNode>> it = elemAggs.fields();
+                    Iterator<Map.Entry<String, JsonNode>> it = elemAggs.fields();
 
-                while (it.hasNext()) {
+                    while (it.hasNext()) {
 
-                    Map.Entry<String, JsonNode> agg = it.next();
+                        Map.Entry<String, JsonNode> agg = it.next();
 
-                    String aggName = agg.getKey();
-                    ObjectNode aggObject = (ObjectNode) agg.getValue();
+                        String aggName = agg.getKey();
+                        ObjectNode aggObject = (ObjectNode) agg.getValue();
 
-                    if (aggObject.get("filter") != null) {
-                        context.add("$.aggs." + aggName + "filter", filterElement);
-                    } else {
-                        context.put("$.aggs." + aggName, "filter", filterElement);
+                        if (aggObject.get("filter") != null) {
+                            context.add("$.aggs." + aggName + "filter", filterElement);
+                        } else {
+                            context.put("$.aggs." + aggName, "filter", filterElement);
+                        }
                     }
-                }
-            } catch (PathNotFoundException ex) {
-            }
-
-            //update 'query' element
-            try {
-                ObjectNode elemQueryBool = context.read("$.query.bool");
-
-                if (elemQueryBool.get("filter") != null) {
-                    context.add("$.query.bool.filter", filterElement);
-                } else {
-                    context.put("$.query.bool", "filter", filterElement);
+                } catch (PathNotFoundException ex) {
                 }
 
-            } catch (PathNotFoundException ex) {
+                //update 'query' element
+                try {
+                    ObjectNode elemQueryBool = context.read("$.query.bool");
+
+                    if (elemQueryBool.get("filter") != null) {
+                        context.add("$.query.bool.filter", filterElement);
+                    } else {
+                        context.put("$.query.bool", "filter", filterElement);
+                    }
+
+                } catch (PathNotFoundException ex) {
+                }
+
+            } else {
+                LOG.warn("Request was not altered, no filter element was added");
             }
 
             return context.jsonString();
 
         } catch (IOException ex) {
-            Logger.getLogger(ElasticSearchAuthQueryEditor.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("Exception while adding filter element to request", ex);
         }
-        
+
         return null;
     }
 

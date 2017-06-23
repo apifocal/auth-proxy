@@ -149,7 +149,9 @@ public class AuthProxyServlet extends HttpServlet {
 
     private String readInputStream(InputStream is, String charset) throws IOException {
         StringWriter reqStringWriter = new StringWriter();
-        IOUtils.copy(is, reqStringWriter, charset);
+        if (is != null) {
+            IOUtils.copy(is, reqStringWriter, charset);
+        }
         return reqStringWriter.toString();
     }
 }
