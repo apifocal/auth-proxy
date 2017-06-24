@@ -15,6 +15,7 @@
  */
 package org.apifocal.authproxy.core;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -24,11 +25,12 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.apifocal.authproxy.api.QueryEditor;
@@ -45,12 +47,8 @@ public abstract class ElasticSearchAuthQueryEditor implements QueryEditor {
 
     abstract protected ObjectNode createAuthFilterElement(HttpServletRequest req);
 
-    @Override
-    public String updateRequest(HttpServletRequest req) {
-
-        try {
-            final String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-
+    private String updateRequestItem(HttpServletRequest req, String body) {
+        
             Configuration conf = Configuration.builder()
                     .jsonProvider(new JacksonJsonNodeJsonProvider())
                     .mappingProvider(new JacksonMappingProvider())
@@ -100,7 +98,33 @@ public abstract class ElasticSearchAuthQueryEditor implements QueryEditor {
             }
 
             return context.jsonString();
+    }
 
+    @Override
+    @SuppressWarnings("deprecation")
+    public String updateRequest(HttpServletRequest req) {
+
+        try {
+            final String bodyIn = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            
+            //split multiroot json (since we use ES multisearch)
+            byte[] bytes = bodyIn.getBytes(StandardCharsets.UTF_8);
+            final InputStream in = new ByteArrayInputStream(bytes);
+            try {
+                String bodyOut = "";
+                
+                for (Iterator it = new ObjectMapper().readValues(
+                        new JsonFactory().createJsonParser(in), Map.class); it.hasNext();) {
+
+                    String body = new ObjectMapper().writeValueAsString(it.next());
+
+                    bodyOut += updateRequestItem(req, body);
+                }
+
+                return bodyOut;
+            } finally {
+                in.close();
+            }
         } catch (IOException ex) {
             LOG.error("Exception while adding filter element to request", ex);
         }
