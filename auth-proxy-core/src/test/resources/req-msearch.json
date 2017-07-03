@@ -1,0 +1,44 @@
+{
+    "search_type": "count",
+    "ignore_unavailable": true,
+    "index": "silkmq"
+}
+{
+    "size": 0,
+    "query": {
+        "bool": {
+            "filter": [
+                {
+                    "range": {
+                        "eventTime": {
+                            "gte": "1497686810540",
+                            "lte": "1498291610540",
+                            "format": "epoch_millis"
+                        }
+                    }
+                },
+                {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "tenant.id:o1 AND project.id:PROJ AND client.username:CLIENT AND type:\"messageConsumed\""
+                    }
+                }
+            ]
+        }
+    },
+    "aggs": {
+        "2": {
+            "date_histogram": {
+                "interval": "2h",
+                "field": "eventTime",
+                "min_doc_count": 0,
+                "extended_bounds": {
+                    "min": "1497686810540",
+                    "max": "1498291610540"
+                },
+                "format": "epoch_millis"
+            },
+            "aggs": {}
+        }
+    }
+}
