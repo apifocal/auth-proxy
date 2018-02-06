@@ -14,10 +14,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.karaf</groupId>
-            <artifactId>apache-karaf</artifactId>
-            <type>zip</type>
-            <version>${karaf.version}</version>  <!-- TODO: use ${karaf.version} when KARAF-4930 gets closed -->
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>framework</artifactId>
+            <scope>provided</scope>
+            <type>kar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>standard</artifactId>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -33,7 +40,6 @@
             <plugin>
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
-                <version>4.0.5</version>  <!-- TODO: use ${karaf.version} when KARAF-4930 gets closed -->
                 <executions>
                     <execution>
                         <id>validate-features</id>
@@ -54,10 +60,14 @@
                     <descriptors>
                         <descriptor>file:${project.build.directory}/feature/feature.xml</descriptor>
                     </descriptors>
+                    <distribution>org.apache.karaf.features:framework</distribution>
                     <features>
                         <feature>auth-proxy-core</feature>
                         <feature>auth-proxy-jaas</feature>
                     </features>
+                    <framework>
+                        <feature>framework</feature>
+                    </framework>
                 </configuration>
             </plugin>
         </plugins>
