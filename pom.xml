@@ -33,13 +33,11 @@
     </scm>
 
     <properties>
-        <jackson.version>2.8.10</jackson.version>
+        <jackson.version>2.9.7</jackson.version>
         <junit.version>4.12</junit.version>
         <osgi.version>6.0.0</osgi.version>
         <slf4j.version>1.7.25</slf4j.version>
         <karaf.version>4.1.6</karaf.version>
-
-        <karaf-maven-plugin.version>4.2.1</karaf-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -118,7 +116,7 @@
                 <plugin>
                     <groupId>org.apache.karaf.tooling</groupId>
                     <artifactId>karaf-maven-plugin</artifactId>
-                    <version>${karaf-maven-plugin.version}</version>  <!-- TODO: use ${karaf.version} when KARAF-4930 gets closed -->
+                    <version>${karaf.version}</version>
                     <extensions>true</extensions>
                 </plugin>
                 <plugin>
